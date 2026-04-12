@@ -1,5 +1,4 @@
 # Random Items
-This repo is a fork of [RandomItems](https://github.com/bennett-sh/hm-random-items) by bennett-sh. All credits go to him.
 
 A Hitman 3 SDK mod that allows you to spawn a random item every 15 seconds by default, or whatever delay you choose.
 
