@@ -311,9 +311,6 @@ RandomItems::RandomItems()
 void RandomItems::OnEngineInitialized() {
     Logger::Info("RandomItems has been initialized!");
 
-    std::random_device rd;
-    m_RandomGenerator = std::mt19937(rd());
-
     const ZMemberDelegate<RandomItems, void(const SGameUpdateEvent&)> s_Delegate(this, &RandomItems::OnFrameUpdate);
     Globals::GameLoopManager->RegisterFrameUpdate(s_Delegate, 1, EUpdateMode::eUpdatePlayMode);
 }
