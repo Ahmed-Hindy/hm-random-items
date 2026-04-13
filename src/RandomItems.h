@@ -37,9 +37,9 @@ private:
 
     // Full list of categories the user can toggle
     const std::vector<std::string> m_AllCategories {
-        "assaultrifle", "sniperrifle", "melee",       "explosives",
-        "tool",         "pistol",      "shotgun",     "suitcase",
-        "smg",          "distraction", "poison",      "container"
+        "pistol", "smg", "shotgun", "assaultrifle",
+        "sniperrifle", "melee", "tool", "distraction",
+        "poison", "explosives", "suitcase", "container",
     };
 
     // One flag per category; true means enabled.
