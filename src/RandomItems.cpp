@@ -1,5 +1,5 @@
 // RandomItems.cpp
-// Plugin for the Hitman Random Items mod. Spawns items in the world or adds
+//  Hitman Random Items mod. Spawns items in the world or adds
 // them to inventory at intervals.
 
 #include "RandomItems.h"
@@ -304,10 +304,7 @@ RandomItems::RandomItems()
 }
 
 
-/**
- * Called when the game engine has finished initializing.
- * Registers the frame update delegate for continuous updates.
- */
+
 void RandomItems::OnEngineInitialized() {
     Logger::Info("RandomItems has been initialized!");
 
@@ -315,30 +312,17 @@ void RandomItems::OnEngineInitialized() {
     Globals::GameLoopManager->RegisterFrameUpdate(s_Delegate, 1, EUpdateMode::eUpdatePlayMode);
 }
 
-
-
-
-/**
- * Destructor. Unregisters the frame update delegate to clean up resources.
- */
 RandomItems::~RandomItems() {
     const ZMemberDelegate<RandomItems, void(const SGameUpdateEvent&)> s_Delegate(this, &RandomItems::OnFrameUpdate);
     Globals::GameLoopManager->UnregisterFrameUpdate(s_Delegate, 1, EUpdateMode::eUpdatePlayMode);
 }
 
-/**
- * Draws the toggle button in the main mod menu.
- */
 void RandomItems::OnDrawMenu() {
     if (ImGui::Button(ICON_MD_LOCAL_FIRE_DEPARTMENT " Random Items")) {
         m_ShowMessage = !m_ShowMessage;
     }
 }
 
-/**
- * Renders the mod UI, including controls for start/stop, delay, spawn mode, and filters.
- * @param p_HasFocus Whether the UI window currently has input focus.
- */
 void RandomItems::OnDrawUI(bool p_HasFocus) {
     if (m_ShowMessage && p_HasFocus) {
         if (ImGui::Begin(ICON_MD_LOCAL_FIRE_DEPARTMENT " Random Items", &m_ShowMessage)) {
@@ -391,10 +375,6 @@ void RandomItems::OnDrawUI(bool p_HasFocus) {
     }
 }
 
-/**
- * Called every frame when the game is updating. Accumulates time and spawns items at intervals.
- * @param p_UpdateEvent Contains timing information for this frame.
- */
 void RandomItems::OnFrameUpdate(const SGameUpdateEvent& p_UpdateEvent) {
     if (!m_Running) return;
 
@@ -414,10 +394,8 @@ void RandomItems::LoadRepositoryProps()
 {
     Logger::Info("Loading repository (your game will freeze shortly)");
 
-    // 1) Clear out any old entries
     m_RepositoryProps.clear();
 
-    // 2) Build a list of only the categories the user has checked
     std::vector<std::string> s_IncludedCategories;
     for (size_t i = 0; i < m_AllCategories.size(); ++i) {
         if (m_CategoryEnabled[i]) {
@@ -425,14 +403,13 @@ void RandomItems::LoadRepositoryProps()
         }
     }
 
-    // 3) Ensure the repository resource is loaded
     if (!m_RepositoryResource)
     {
         const auto s_ID = ResId<"[assembly:/repository/pro.repo].pc_repo">;
         Globals::ResourceManager->GetResourcePtr(m_RepositoryResource, s_ID, 0);
     }
 
-    // 4) Only proceed if we have valid data
+    // Only proceed if we have valid data
     if (m_RepositoryResource.GetResourceInfo().status == RESOURCE_STATUS_VALID)
     {
         // Raw map: ZRepositoryID → ZDynamicObject
@@ -440,7 +417,6 @@ void RandomItems::LoadRepositoryProps()
             THashMap<ZRepositoryID, ZDynamicObject, TDefaultHashMapPolicy<ZRepositoryID>>*
         >(m_RepositoryResource.GetResourceData());
 
-        // 5) Iterate every entry in the repo
         for (auto it = s_RepositoryData->begin(); it != s_RepositoryData->end(); ++it)
         {
             const ZDynamicObject* s_DynamicObject = &it->second;
@@ -452,7 +428,7 @@ void RandomItems::LoadRepositoryProps()
             std::string s_TitleToAdd;
             ZRepositoryID s_RepoIdToAdd("");
 
-            // 6) Pull out the fields used for filtering and spawning
+            // Pull out the fields used for filtering and spawning
             for (const auto& kv : *s_Entries)
             {
                 std::string s_Key = kv.sKey.c_str();
@@ -478,7 +454,6 @@ void RandomItems::LoadRepositoryProps()
                     std::string cat = ConvertDynamicObjectValueTString(kv.value);
                     std::transform(cat.begin(), cat.end(), cat.begin(), ::toupper);
 
-                    // Check it against the enabled category list
                     bool match = false;
                     for (auto& want : s_IncludedCategories)
                     {
@@ -498,13 +473,11 @@ void RandomItems::LoadRepositoryProps()
                 // else {Logger::Debug("Unresolved skey: {}", s_Key);}
             }
 
-            // 7) Apply the blacklist
             if (s_Included && IsBlacklistedRepositoryId(s_Id))
             {
                 s_Included = false;
             }
 
-            // 8) Add to pool
             if (s_Included && (s_HasTitle || m_IncludeItemsWithoutTitle))
             {
                 m_RepositoryProps.push_back({ s_TitleToAdd, s_RepoIdToAdd });
@@ -655,5 +628,4 @@ void RandomItems::GiveRandomItem()
     }
 }
 
-// Macro to register plugin with the Hitman mod framework
 DECLARE_ZHM_PLUGIN(RandomItems);
